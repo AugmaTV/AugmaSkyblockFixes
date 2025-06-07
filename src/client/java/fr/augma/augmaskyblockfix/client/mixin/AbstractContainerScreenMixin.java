@@ -1,4 +1,4 @@
-package fr.augma.fixskyblockwtf.client.mixin;
+package fr.augma.augmaskyblockfix.client.mixin;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -34,4 +34,5 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
             }
         }
     }
+
 }

@@ -1,8 +1,8 @@
-package fr.augma.fixskyblockwtf;
+package fr.augma.augmaskyblockfix;
 
 import net.fabricmc.api.ModInitializer;
 
-public class Fixskyblockwtf implements ModInitializer {
+public class AugmaSkyblockFixes implements ModInitializer {
 
     @Override
     public void onInitialize() {

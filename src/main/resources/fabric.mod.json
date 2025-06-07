@@ -1,29 +1,27 @@
 {
   "schemaVersion": 1,
-  "id": "fixskyblockwtf",
+  "id": "augmaskyblockfix",
   "version": "${version}",
-  "name": "FIxSkyblockWTF",
+  "name": "AugmaSkyblockFixes",
   "description": "",
   "authors": [],
   "contact": {},
   "license": "All-Rights-Reserved",
-  "icon": "assets/fixskyblockwtf/icon.png",
+  "icon": "assets/augmaskyblockfix/icon.png",
   "environment": "client",
   "entrypoints": {
-    "fabric-datagen": [
-      "fr.augma.fixskyblockwtf.client.FixskyblockwtfDataGenerator"
-    ],
+    "fabric-datagen": [],
     "client": [
-      "fr.augma.fixskyblockwtf.client.FixskyblockwtfClient"
+      "fr.augma.augmaskyblockfix.client.AugmaSkyblockFixes"
     ],
     "main": [
-      "fr.augma.fixskyblockwtf.Fixskyblockwtf"
+      "fr.augma.augmaskyblockfix.AugmaSkyblockFixes"
     ]
   },
   "mixins": [
-    "fixskyblockwtf.mixins.json",
+    "augmaskyblockfix.mixins.json",
     {
-      "config": "fixskyblockwtf.client.mixins.json",
+      "config": "augmaskyblockfix.client.mixins.json",
       "environment": "client"
     }
   ],

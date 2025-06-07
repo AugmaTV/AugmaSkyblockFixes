@@ -1,9 +1,10 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "fr.augma.fixskyblockwtf.mixin",
+  "package": "fr.augma.augmaskyblockfix.client.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
+  "client": [
+    "AbstractContainerScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
