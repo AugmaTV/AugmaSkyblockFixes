@@ -15,10 +15,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Mixin(AbstractContainerScreen.class)
 public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMenu> extends Screen implements MenuAccess<T> {
+
+    private static final List<String> BLOCKED_IDS = Arrays.asList("SKYBLOCK_MENU", "MAP");
 
     @Shadow
     protected T menu;
@@ -34,7 +38,11 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
             if (inventoryMenu.getCarried() != ItemStack.EMPTY && inventoryMenu.getCarried().getItem() == Items.NETHER_STAR) {
                 final ItemStack itemStack = inventoryMenu.getCarried();
                 final Optional<String> optSkyblockId = itemStack.getComponents().get(DataComponents.CUSTOM_DATA).copyTag().getString("id");
-                if (optSkyblockId.isPresent() && optSkyblockId.get().equalsIgnoreCase("SKYBLOCK_MENU")) {
+                if (!optSkyblockId.isPresent()) {
+                    return;
+                }
+
+                if (BLOCKED_IDS.contains(optSkyblockId.get())) {
                     inventoryMenu.setCarried(ItemStack.EMPTY);
                 }
             }
