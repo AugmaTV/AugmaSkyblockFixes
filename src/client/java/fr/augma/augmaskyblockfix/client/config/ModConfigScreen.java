@@ -10,68 +10,68 @@ import java.awt.Color;
 public class ModConfigScreen {
 
     public static Screen create(Screen parent) {
-        ModConfig config = ModConfig.get();
-        ModConfig defaults = new ModConfig();
+        final ModConfig config = ModConfig.get();
+        final ModConfig defaults = new ModConfig();
 
         return YetAnotherConfigLib.createBuilder()
                 .title(Component.literal("AugmaSkyblockFixes Configuration"))
                 .category(ConfigCategory.createBuilder()
                         .name(Component.literal("Bat Settings"))
-                        .tooltip(Component.literal("Configuration des chauves-souris"))
+                        .tooltip(Component.literal("Bat display configuration"))
 
                         // === GROUPE SCALE ===
                         .group(OptionGroup.createBuilder()
                                 .name(Component.literal("Scale"))
-                                .description(OptionDescription.of(Component.literal("Options de mise à l'échelle des chauves-souris")))
+                                .description(OptionDescription.of(Component.literal("Scaling the bat model")))
 
                                 .option(Option.<Boolean>createBuilder()
-                                        .name(Component.literal("Activer le Scale"))
-                                        .description(OptionDescription.of(Component.literal("Active ou désactive l'agrandissement des chauves-souris")))
-                                        .binding(defaults.batScaleEnabled, () -> config.batScaleEnabled, val -> config.batScaleEnabled = val)
+                                        .name(Component.literal("Enable scale"))
+                                        .description(OptionDescription.of(Component.literal("Enable or disable the bat model scaling")))
+                                        .binding(defaults.isBatScaleEnabled(), () -> config.isBatScaleEnabled(), val -> config.setBatScaleEnabled(val))
                                         .controller(TickBoxControllerBuilder::create)
                                         .build())
 
                                 .option(Option.<Float>createBuilder()
-                                        .name(Component.literal("Taille du Scale"))
-                                        .description(OptionDescription.of(Component.literal("Multiplicateur de taille des chauves-souris (1.0 = taille normale)")))
-                                        .binding(defaults.batScaleSize, () -> config.batScaleSize, val -> config.batScaleSize = val)
+                                        .name(Component.literal("Scale size"))
+                                        .description(OptionDescription.of(Component.literal("Scale multiplier (1.0 = normal size)")))
+                                        .binding(defaults.getBatScaleSize(), () -> config.getBatScaleSize(), val -> config.setBatScaleSize(val))
                                         .controller(opt -> FloatSliderControllerBuilder.create(opt)
-                                                .range(0.5F, 10.0F)
-                                                .step(0.5F))
+                                                .range(1F, 10.0F)
+                                                .step(0.1F))
                                         .build())
 
                                 .build())
 
                         // === GROUPE HITBOX ===
                         .group(OptionGroup.createBuilder()
-                                .name(Component.literal("Hitbox"))
-                                .description(OptionDescription.of(Component.literal("Options d'affichage de la hitbox des chauves-souris")))
+                                .name(Component.literal("Bat Hitbox"))
+                                .description(OptionDescription.of(Component.literal("Hitbox bat related settings")))
 
                                 .option(Option.<Boolean>createBuilder()
-                                        .name(Component.literal("Afficher la Hitbox"))
-                                        .description(OptionDescription.of(Component.literal("Affiche une hitbox autour des chauves-souris")))
-                                        .binding(defaults.batHitboxEnabled, () -> config.batHitboxEnabled, val -> config.batHitboxEnabled = val)
+                                        .name(Component.literal("Display hitbox"))
+                                        .description(OptionDescription.of(Component.literal("Display the bat hitbox")))
+                                        .binding(defaults.isBatHitboxEnabled(), () -> config.isBatHitboxEnabled(), val -> config.setBatHitboxEnabled(val))
                                         .controller(TickBoxControllerBuilder::create)
                                         .build())
 
                                 .option(Option.<Boolean>createBuilder()
-                                        .name(Component.literal("Mode Rainbow"))
-                                        .description(OptionDescription.of(Component.literal("Active le mode arc-en-ciel pour la hitbox")))
-                                        .binding(defaults.batHitboxRainbow, () -> config.batHitboxRainbow, val -> config.batHitboxRainbow = val)
+                                        .name(Component.literal("Rainbow hitbox"))
+                                        .description(OptionDescription.of(Component.literal("Enable rainbow hitbox color")))
+                                        .binding(defaults.isBatHitboxRainbow(), () -> config.isBatHitboxRainbow(), val -> config.setBatHitboxRainbow(val))
                                         .controller(TickBoxControllerBuilder::create)
                                         .build())
 
                                 .option(Option.<Color>createBuilder()
-                                        .name(Component.literal("Couleur de la Hitbox"))
-                                        .description(OptionDescription.of(Component.literal("Couleur de la hitbox (utilisée si le mode rainbow est désactivé)")))
-                                        .binding(defaults.batHitboxColor, () -> config.batHitboxColor, val -> config.batHitboxColor = val)
+                                        .name(Component.literal("Hitbox color"))
+                                        .description(OptionDescription.of(Component.literal("Change the bat hitbox color if hitbox is enabled and rainbow display disabled")))
+                                        .binding(defaults.getBatHitboxColor(), () -> config.getBatHitboxColor(), val -> config.setBatHitboxColor(val))
                                         .controller(ColorControllerBuilder::create)
                                         .build())
 
                                 .option(Option.<Integer>createBuilder()
-                                        .name(Component.literal("Vitesse Rainbow"))
-                                        .description(OptionDescription.of(Component.literal("Durée d'un cycle rainbow en millisecondes")))
-                                        .binding(defaults.rainbowSpeed, () -> config.rainbowSpeed, val -> config.rainbowSpeed = val)
+                                        .name(Component.literal("Rainbow speed"))
+                                        .description(OptionDescription.of(Component.literal("Rainbow cycle in milliseconds")))
+                                        .binding(defaults.getRainbowSpeed(), () -> config.getRainbowSpeed(), val -> config.setRainbowSpeed(val))
                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                 .range(500, 10000)
                                                 .step(100))

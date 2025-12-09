@@ -42,16 +42,13 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    annotationProcessor "org.projectlombok:lombok:1.18.42"
+    implementation "org.projectlombok:lombok:1.18.42"
 
-    // Fabric API
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.126.0+1.21.5"
-
-    // YACL
     modImplementation("dev.isxander:yet-another-config-lib:3.8.1+1.21.5-fabric") {
         exclude group: "com.twelvemonkeys.imageio"
     }
-
-    // Mod Menu (optionnel)
     modImplementation "com.terraformersmc:modmenu:14.0.0"
 }
 
