@@ -16,9 +16,6 @@
     ],
     "main": [
       "fr.augma.augmaskyblockfix.AugmaSkyblockFixes"
-    ],
-    "modmenu": [
-      "fr.augma.augmaskyblockfix.client.config.ModMenuIntegration"
     ]
   },
   "mixins": [
@@ -30,10 +27,9 @@
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",
-    "minecraft": ">=1.21.5 <=1.21.8"
+    "minecraft": ">=1.21.9 <=1.21.10"
   },
   "suggests": {
-    "yet_another_config_lib_v3": "*",
-    "modmenu": "*"
+    "yet_another_config_lib_v3": "*"
   }
 }
