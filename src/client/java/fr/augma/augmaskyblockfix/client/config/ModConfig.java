@@ -43,6 +43,10 @@ public class ModConfig {
     @SerialEntry
     private int rainbowSpeed = 3000;
 
+    public Color getNonRainbowBatColor() {
+        return this.batHitboxColor;
+    }
+
     public Color getBatHitboxColor() {
         if (this.isBatHitboxRainbow()) {
             final int rainbowSpeed = ModConfig.get().getRainbowSpeed();

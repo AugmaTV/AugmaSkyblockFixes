@@ -57,7 +57,7 @@ public class ModConfigScreen {
                                     Option.<Color>createBuilder()
                                         .name(Component.literal("Hitbox color"))
                                         .description(OptionDescription.of(Component.literal("Change the bat hitbox color, if rainbow display is not disabled")))
-                                        .binding(defaults.getBatHitboxColor(), () -> config.getBatHitboxColor(), val -> config.setBatHitboxColor(val))
+                                        .binding(defaults.getNonRainbowBatColor(), () -> config.getNonRainbowBatColor(), val -> config.setBatHitboxColor(val))
                                         .controller(ColorControllerBuilder::create)
                                         .build()
                                 )
