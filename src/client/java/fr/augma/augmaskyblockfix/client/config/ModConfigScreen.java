@@ -10,9 +10,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ModConfigScreen {
 
 	public static Screen create(final Screen parent) {
@@ -35,18 +32,12 @@ public class ModConfigScreen {
 			}
 		}
 
-		final List<Integer> snapshot = new ArrayList<>(entities.getSelection());
+		entities.apply = () -> {
+			entities.applySelection(catalogue);
+			Minecraft.getInstance().setScreenAndShow(create(parent, editor.getSelectedCategory()));
+		};
 
 		return new MoulConfigScreenComponent(Component.literal("AugmaSkyblockFixes Configuration"), new GuiContext(new GuiElementComponent(editor)), parent) {
-			@Override
-			public void tick() {
-				super.tick();
-				if (!entities.getSelection().equals(snapshot)) {
-					entities.applySelection(catalogue);
-					Minecraft.getInstance().setScreenAndShow(create(parent, editor.getSelectedCategory()));
-				}
-			}
-
 			@Override
 			public void removed() {
 				super.removed();

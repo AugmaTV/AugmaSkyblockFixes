@@ -1,6 +1,7 @@
 package fr.augma.augmaskyblockfix.client.config;
 
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import lombok.AccessLevel;
 import lombok.Getter;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,6 +22,10 @@ public class EntityConfig {
 
 	@EntityListEditor
 	public transient List<Integer> selection = new ArrayList<>();
+
+	@ConfigEditorButton(buttonText = "Apply")
+	public transient Runnable apply = () -> {
+	};
 
 	@Getter(AccessLevel.NONE)
 	private transient Map<EntityType<?>, EntityEntryConfig> resolved;
