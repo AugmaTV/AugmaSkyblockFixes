@@ -29,7 +29,7 @@ public abstract class EntityRendererMixin {
 
         final AABB relativeBox = new AABB(-state.boundingBoxWidth / 2, 0, -state.boundingBoxWidth / 2, state.boundingBoxWidth / 2, state.boundingBoxHeight, state.boundingBoxWidth / 2);
         final int packedColor = entry.getHitboxRgb();
-        final float lineWidth = Minecraft.getInstance().gameRenderer.getGameRenderState().windowRenderState.appropriateLineWidth;
+        final float lineWidth = Minecraft.getInstance().getWindow().getAppropriateLineWidth();
         submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.lines(), (pose, vertexConsumer) -> Shapes.create(relativeBox).forAllEdges((x1, y1, z1, x2, y2, z2) -> {
             final Vector3f normal = new Vector3f((float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1)).normalize();
             vertexConsumer.addVertex(pose, (float) x1, (float) y1, (float) z1).setColor(packedColor).setNormal(pose, normal).setLineWidth(lineWidth);
