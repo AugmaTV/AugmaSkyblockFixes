@@ -17,6 +17,10 @@ public class ModConfig extends Config {
 	@Category(name = "Dungeon", desc = "Dungeon settings")
 	public DungeonConfig dungeon = new DungeonConfig();
 
+	@Expose
+	@Category(name = "Miscellaneous", desc = "Miscellaneous settings")
+	public MiscellaneousConfig miscellaneous = new MiscellaneousConfig();
+
 	public static ManagedConfig<ModConfig> managed() {
 		return MANAGED;
 	}
