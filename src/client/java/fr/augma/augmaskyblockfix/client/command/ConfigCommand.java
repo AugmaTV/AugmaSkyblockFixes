@@ -15,7 +15,7 @@ public class ConfigCommand {
                 .executes(context -> {
                     // Schedule opening the screen on the next tick to avoid issues
                     Minecraft.getInstance().schedule(() -> {
-                        Minecraft.getInstance().setScreen(ModConfigScreen.create(null));
+                        Minecraft.getInstance().setScreenAndShow(ModConfigScreen.create(null));
                     });
                     return 1;
                 })
@@ -26,7 +26,7 @@ public class ConfigCommand {
             ClientCommands.literal("augmaskyblockfixes")
                 .executes(context -> {
                     Minecraft.getInstance().schedule(() -> {
-                        Minecraft.getInstance().setScreen(ModConfigScreen.create(null));
+                        Minecraft.getInstance().setScreenAndShow(ModConfigScreen.create(null));
                     });
                     return 1;
                 })

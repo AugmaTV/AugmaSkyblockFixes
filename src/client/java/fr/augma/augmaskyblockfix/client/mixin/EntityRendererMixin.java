@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import org.joml.Vector3f;
@@ -21,7 +21,7 @@ public abstract class EntityRendererMixin {
 
     @Inject(method = "submit", at = @At("TAIL"))
     private void renderBatHitbox(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
-        if (state.entityType != EntityType.BAT || !ModConfig.get().getDungeon().getBat().isHitboxEnabled()) {
+        if (state.entityType != EntityTypes.BAT || !ModConfig.get().getDungeon().getBat().isHitboxEnabled()) {
             return;
         }
 
