@@ -72,8 +72,4 @@ public class EntityConfig {
 		}
 	}
 
-	public static String[] catalogue() {
-		return BuiltInRegistries.ENTITY_TYPE.keySet().stream().map(Identifier::toString).sorted().toArray(String[]::new);
-	}
-
 }

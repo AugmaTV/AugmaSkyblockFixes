@@ -19,7 +19,7 @@ public class ModConfigScreen {
 	private static Screen create(final Screen parent, final String selectedCategory) {
 		final ManagedConfig<ModConfig> managed = ModConfig.managed();
 		final EntityConfig entities = managed.getInstance().getEntities();
-		final String[] catalogue = EntityConfig.catalogue();
+		final EntityCatalogue catalogue = EntityCatalogue.build();
 
 		managed.rebuildConfigProcessor();
 		DynamicEntityCategory.install(managed.getProcessor(), entities, catalogue);
@@ -33,7 +33,7 @@ public class ModConfigScreen {
 		}
 
 		entities.apply = () -> {
-			entities.applySelection(catalogue);
+			entities.applySelection(catalogue.ids());
 			Minecraft.getInstance().setScreenAndShow(create(parent, editor.getSelectedCategory()));
 		};
 
@@ -41,7 +41,7 @@ public class ModConfigScreen {
 			@Override
 			public void removed() {
 				super.removed();
-				entities.applySelection(catalogue);
+				entities.applySelection(catalogue.ids());
 				managed.saveToFile();
 			}
 		};
