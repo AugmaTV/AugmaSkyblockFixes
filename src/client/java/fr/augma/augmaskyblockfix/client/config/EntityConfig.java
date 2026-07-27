@@ -1,9 +1,6 @@
 package fr.augma.augmaskyblockfix.client.config;
 
 import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import io.github.notenoughupdates.moulconfig.observer.Property;
 import lombok.AccessLevel;
 import lombok.Getter;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -20,50 +17,59 @@ import java.util.Map;
 public class EntityConfig {
 
 	@Expose
-	@ConfigOption(name = "Entities", desc = "Comma separated entity ids. Reopen this screen to edit the settings of each one")
-	@ConfigEditorText
-	public Property<String> entities = Property.of("minecraft:bat");
-
-	@Expose
 	public Map<String, EntityEntryConfig> entries = new LinkedHashMap<>();
+
+	@Getter(AccessLevel.NONE)
+	@EntityListEditor
+	public transient List<Integer> selection = new ArrayList<>();
 
 	@Getter(AccessLevel.NONE)
 	private transient Map<EntityType<?>, EntityEntryConfig> resolved;
 
 	public EntityEntryConfig find(final EntityType<?> type) {
 		if (this.resolved == null) {
-			this.sync();
+			this.resolve();
 		}
 		return this.resolved.get(type);
 	}
 
-	public List<String> sync() {
+	public List<Integer> selectionFrom(final String[] catalogue) {
+		this.selection.clear();
+		for (int index = 0; index < catalogue.length; index++) {
+			if (this.entries.containsKey(catalogue[index])) {
+				this.selection.add(index);
+			}
+		}
+		return this.selection;
+	}
+
+	public void applySelection(final String[] catalogue) {
 		final List<String> ids = new ArrayList<>();
-		for (final String entry : this.entities.get().split(",")) {
-			final String id = entry.trim();
-			if (!id.isEmpty() && !ids.contains(id)) {
-				ids.add(id);
+		for (final int index : this.selection) {
+			if (index >= 0 && index < catalogue.length) {
+				ids.add(catalogue[index]);
 			}
 		}
 
 		this.entries.keySet().retainAll(ids);
-		this.resolved = new HashMap<>();
 		for (final String id : ids) {
-			final EntityType<?> type = resolve(id);
-			if (type == null) {
-				continue;
-			}
-			this.resolved.put(type, this.entries.computeIfAbsent(id, key -> new EntityEntryConfig()));
+			this.entries.computeIfAbsent(id, key -> new EntityEntryConfig());
 		}
-		return ids;
+		this.resolve();
 	}
 
-	private static EntityType<?> resolve(final String id) {
-		final Identifier identifier = Identifier.tryParse(id);
-		if (identifier == null || !BuiltInRegistries.ENTITY_TYPE.containsKey(identifier)) {
-			return null;
+	public void resolve() {
+		this.resolved = new HashMap<>();
+		for (final Map.Entry<String, EntityEntryConfig> entry : this.entries.entrySet()) {
+			final Identifier identifier = Identifier.tryParse(entry.getKey());
+			if (identifier != null && BuiltInRegistries.ENTITY_TYPE.containsKey(identifier)) {
+				this.resolved.put(BuiltInRegistries.ENTITY_TYPE.getValue(identifier), entry.getValue());
+			}
 		}
-		return BuiltInRegistries.ENTITY_TYPE.getValue(identifier);
+	}
+
+	public static String[] catalogue() {
+		return BuiltInRegistries.ENTITY_TYPE.keySet().stream().map(Identifier::toString).sorted().toArray(String[]::new);
 	}
 
 }
