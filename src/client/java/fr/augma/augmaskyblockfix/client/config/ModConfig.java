@@ -7,6 +7,7 @@ import io.github.notenoughupdates.moulconfig.common.text.StructuredText;
 import io.github.notenoughupdates.moulconfig.managed.ManagedConfig;
 import lombok.Getter;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.Minecraft;
 
 @Getter
 public class ModConfig extends Config {
@@ -35,6 +36,10 @@ public class ModConfig extends Config {
 	private static final class Holder {
 
 		private static final ManagedConfig<ModConfig> MANAGED = ManagedConfig.create(FabricLoader.getInstance().getConfigDir().resolve("augmaskyblockfix.json").toFile(), ModConfig.class);
+
+		static {
+			MANAGED.getInstance().getMiscellaneous().getCenteredPlants().addObserver((oldValue, newValue) -> Minecraft.getInstance().levelRenderer.allChanged());
+		}
 
 	}
 
