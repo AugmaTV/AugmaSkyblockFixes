@@ -1,6 +1,7 @@
 package fr.augma.augmaskyblockfix.client.mixin;
 
 import fr.augma.augmaskyblockfix.client.config.ModConfig;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.phys.Vec3;
@@ -14,7 +15,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(method = "getOffset", at = @At("HEAD"), cancellable = true)
     private void centerPlants(BlockPos pos, CallbackInfoReturnable<Vec3> cir) {
-        if (ModConfig.get().getMiscellaneous().isCenteredPlants()) {
+        if (Minecraft.getInstance() != null && ModConfig.get().getMiscellaneous().isCenteredPlants()) {
             cir.setReturnValue(Vec3.ZERO);
         }
     }
