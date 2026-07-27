@@ -13,8 +13,8 @@ import net.fabricmc.loader.api.FabricLoader;
 public class ModConfig extends Config {
 
 	@Expose
-	@Category(name = "Dungeon", desc = "Dungeon settings")
-	public DungeonConfig dungeon = new DungeonConfig();
+	@Category(name = "Entities", desc = "Entity rendering settings")
+	public EntityConfig entities = new EntityConfig();
 
 	@Expose
 	@Category(name = "Miscellaneous", desc = "Miscellaneous settings")
