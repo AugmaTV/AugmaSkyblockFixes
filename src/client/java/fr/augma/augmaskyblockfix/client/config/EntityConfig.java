@@ -19,7 +19,6 @@ public class EntityConfig {
 	@Expose
 	public Map<String, EntityEntryConfig> entries = new LinkedHashMap<>();
 
-	@Getter(AccessLevel.NONE)
 	@EntityListEditor
 	public transient List<Integer> selection = new ArrayList<>();
 
