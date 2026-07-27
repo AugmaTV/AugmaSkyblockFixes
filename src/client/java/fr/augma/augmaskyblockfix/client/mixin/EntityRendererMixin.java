@@ -1,7 +1,7 @@
 package fr.augma.augmaskyblockfix.client.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import fr.augma.augmaskyblockfix.client.config.EntityConfig;
+import fr.augma.augmaskyblockfix.client.config.EntityEntryConfig;
 import fr.augma.augmaskyblockfix.client.config.ModConfig;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -21,13 +21,13 @@ public abstract class EntityRendererMixin {
 
     @Inject(method = "submit", at = @At("TAIL"))
     private void renderEntityHitbox(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
-        final EntityConfig entities = ModConfig.get().getEntities();
-        if (!entities.isHitboxEnabled() || !entities.getHitboxTypes().contains(state.entityType)) {
+        final EntityEntryConfig entry = ModConfig.get().getEntities().find(state.entityType);
+        if (entry == null || !entry.isHitboxEnabled()) {
             return;
         }
 
         final AABB relativeBox = new AABB(-state.boundingBoxWidth / 2, 0, -state.boundingBoxWidth / 2, state.boundingBoxWidth / 2, state.boundingBoxHeight, state.boundingBoxWidth / 2);
-        final int packedColor = entities.getHitboxRgb();
+        final int packedColor = entry.getHitboxRgb();
         submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.lines(), (pose, vertexConsumer) -> Shapes.create(relativeBox).forAllEdges((x1, y1, z1, x2, y2, z2) -> {
             final Vector3f normal = new Vector3f((float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1)).normalize();
             vertexConsumer.addVertex(pose, (float) x1, (float) y1, (float) z1).setColor(packedColor).setNormal(pose, normal).setLineWidth(2.5F);
