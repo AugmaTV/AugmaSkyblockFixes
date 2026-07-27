@@ -27,7 +27,8 @@ public class ChunkRefresher {
 				final LevelChunkSection[] sections = chunk.getSections();
 				for (int index = 0; index < sections.length; index++) {
 					if (sections[index].maybeHas(BlockState::hasOffsetFunction)) {
-						minecraft.levelRenderer.setSectionDirty(chunkX, minSectionY + index, chunkZ);
+						final int sectionY = minSectionY + index;
+						level.setSectionRangeDirty(chunkX, sectionY, chunkZ, chunkX, sectionY, chunkZ);
 					}
 				}
 			}
