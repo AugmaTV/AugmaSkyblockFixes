@@ -13,9 +13,9 @@ public class DynamicEntityCategory {
 
 	private static final int ACCORDION_BASE = 500000;
 
-	public static void install(final MoulConfigProcessor<ModConfig> processor, final EntityConfig config, final String[] catalogue) {
-		config.selectionFrom(catalogue);
-		processor.registerConfigEditor(EntityListEditor.class, (option, annotation) -> new GuiOptionEditorDraggableList(option, catalogue, true, false));
+	public static void install(final MoulConfigProcessor<ModConfig> processor, final EntityConfig config, final EntityCatalogue catalogue) {
+		config.selectionFrom(catalogue.ids());
+		processor.registerConfigEditor(EntityListEditor.class, (option, annotation) -> new GuiOptionEditorDraggableList(option, catalogue.labels(), true, false));
 
 		try {
 			final Field selection = EntityConfig.class.getDeclaredField("selection");
@@ -28,9 +28,14 @@ public class DynamicEntityCategory {
 			processor.emitOption(config, apply, new DynamicOption("Apply", "Refresh the per entity settings after changing the list"));
 
 			int accordionId = ACCORDION_BASE;
-			for (final String id : config.getEntries().keySet()) {
+			for (int index = 0; index < catalogue.ids().length; index++) {
+				final String id = catalogue.ids()[index];
 				final EntityEntryConfig entry = config.getEntries().get(id);
-				processor.beginAccordion(entry, accordionAnchor, new DynamicOption(id, "Settings for " + id), accordionId);
+				if (entry == null) {
+					continue;
+				}
+
+				processor.beginAccordion(entry, accordionAnchor, new DynamicOption(catalogue.labels()[index], id), accordionId);
 				for (final String name : OPTION_FIELDS) {
 					final Field field = EntityEntryConfig.class.getDeclaredField(name);
 					processor.emitOption(entry, field, field.getAnnotation(ConfigOption.class));
