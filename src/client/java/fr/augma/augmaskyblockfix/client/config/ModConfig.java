@@ -13,7 +13,6 @@ import net.fabricmc.loader.api.FabricLoader;
 public class ModConfig extends Config {
 
 	@Expose
-	@Category(name = "Entities", desc = "Entity rendering settings")
 	public EntityConfig entities = new EntityConfig();
 
 	@Expose

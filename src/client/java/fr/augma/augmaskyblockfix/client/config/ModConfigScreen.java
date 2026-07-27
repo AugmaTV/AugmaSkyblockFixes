@@ -11,13 +11,17 @@ public class ModConfigScreen {
 
 	public static Screen create(final Screen parent) {
 		final ManagedConfig<ModConfig> managed = ModConfig.managed();
+		final EntityConfig entities = managed.getInstance().getEntities();
+		final String[] catalogue = EntityConfig.catalogue();
+
 		managed.rebuildConfigProcessor();
-		DynamicEntityCategory.install(managed.getProcessor(), managed.getInstance().getEntities());
+		DynamicEntityCategory.install(managed.getProcessor(), entities, catalogue);
 
 		return new MoulConfigScreenComponent(Component.literal("AugmaSkyblockFixes Configuration"), new GuiContext(new GuiElementComponent(managed.getEditor())), parent) {
 			@Override
 			public void removed() {
 				super.removed();
+				entities.applySelection(catalogue);
 				managed.saveToFile();
 			}
 		};

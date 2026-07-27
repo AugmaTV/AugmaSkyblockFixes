@@ -1,11 +1,11 @@
 package fr.augma.augmaskyblockfix.client.config;
 
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.List;
 
 public class DynamicEntityCategory {
 
@@ -13,24 +13,20 @@ public class DynamicEntityCategory {
 
 	private static final int ACCORDION_BASE = 500000;
 
-	public static void install(final MoulConfigProcessor<ModConfig> processor, final EntityConfig config) {
-		final List<String> ids = config.sync();
-		if (ids.isEmpty()) {
-			return;
-		}
+	public static void install(final MoulConfigProcessor<ModConfig> processor, final EntityConfig config, final String[] catalogue) {
+		config.selectionFrom(catalogue);
+		processor.registerConfigEditor(EntityListEditor.class, (option, annotation) -> new GuiOptionEditorDraggableList(option, catalogue, true, false));
 
 		try {
-			final Field anchor = EntityConfig.class.getDeclaredField("entries");
+			final Field selection = EntityConfig.class.getDeclaredField("selection");
 			final Field accordionAnchor = EntityEntryConfig.class.getDeclaredField(OPTION_FIELDS[0]);
-			processor.beginCategory(config, anchor, "Per entity", "Hitbox and scale settings for each listed entity");
+
+			processor.beginCategory(config, selection, "Entities", "Pick the entities to draw a hitbox around or to scale");
+			processor.emitOption(config, selection, new DynamicOption("Entities", "Add entities with the arrow, drag to reorder, click the cross to remove"));
 
 			int accordionId = ACCORDION_BASE;
-			for (final String id : ids) {
+			for (final String id : config.getEntries().keySet()) {
 				final EntityEntryConfig entry = config.getEntries().get(id);
-				if (entry == null) {
-					continue;
-				}
-
 				processor.beginAccordion(entry, accordionAnchor, new DynamicOption(id, "Settings for " + id), accordionId);
 				for (final String name : OPTION_FIELDS) {
 					final Field field = EntityEntryConfig.class.getDeclaredField(name);
