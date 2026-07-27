@@ -1,7 +1,7 @@
 package fr.augma.augmaskyblockfix.client.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import fr.augma.augmaskyblockfix.client.config.EntityConfig;
+import fr.augma.augmaskyblockfix.client.config.EntityEntryConfig;
 import fr.augma.augmaskyblockfix.client.config.ModConfig;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
@@ -15,9 +15,9 @@ public abstract class LivingEntityRendererMixin {
 
     @Inject(method = "scale", at = @At("HEAD"))
     private void scale(LivingEntityRenderState renderState, PoseStack poseStack, CallbackInfo ci) {
-        final EntityConfig entities = ModConfig.get().getEntities();
-        if (entities.isScaleEnabled() && entities.getScaleTypes().contains(renderState.entityType)) {
-            final float scale = entities.getScaleSize();
+        final EntityEntryConfig entry = ModConfig.get().getEntities().find(renderState.entityType);
+        if (entry != null && entry.isScaleEnabled()) {
+            final float scale = entry.getScaleSize();
             final float yOffset = renderState.boundingBoxHeight * (scale - 1.0F) * 0.5F;
             poseStack.translate(0.0F, yOffset, 0.0F);
             poseStack.scale(scale, scale, scale);
