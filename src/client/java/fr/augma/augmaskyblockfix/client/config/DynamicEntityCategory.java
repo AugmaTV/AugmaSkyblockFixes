@@ -21,8 +21,11 @@ public class DynamicEntityCategory {
 			final Field selection = EntityConfig.class.getDeclaredField("selection");
 			final Field accordionAnchor = EntityEntryConfig.class.getDeclaredField(OPTION_FIELDS[0]);
 
+			final Field apply = EntityConfig.class.getDeclaredField("apply");
+
 			processor.beginCategory(config, selection, "Entities", "Pick the entities to draw a hitbox around or to scale");
 			processor.emitOption(config, selection, new DynamicOption("Entities", "Add entities with the arrow, drag to reorder, click the cross to remove"));
+			processor.emitOption(config, apply, new DynamicOption("Apply", "Refresh the per entity settings below after changing the list"));
 
 			int accordionId = ACCORDION_BASE;
 			for (final String id : config.getEntries().keySet()) {
