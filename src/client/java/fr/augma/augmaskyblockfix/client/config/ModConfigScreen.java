@@ -9,7 +9,13 @@ import net.minecraft.network.chat.Component;
 public class ModConfigScreen {
 
 	public static Screen create(final Screen parent) {
-		return new MoulConfigScreenComponent(Component.literal("AugmaSkyblockFixes Configuration"), new GuiContext(new GuiElementComponent(ModConfig.managed().getEditor())), parent);
+		return new MoulConfigScreenComponent(Component.literal("AugmaSkyblockFixes Configuration"), new GuiContext(new GuiElementComponent(ModConfig.managed().getEditor())), parent) {
+			@Override
+			public void removed() {
+				super.removed();
+				ModConfig.managed().saveToFile();
+			}
+		};
 	}
 
 }
