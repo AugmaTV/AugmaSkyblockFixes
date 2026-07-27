@@ -11,8 +11,6 @@ import net.fabricmc.loader.api.FabricLoader;
 @Getter
 public class ModConfig extends Config {
 
-	private static final ManagedConfig<ModConfig> MANAGED = ManagedConfig.create(FabricLoader.getInstance().getConfigDir().resolve("augmaskyblockfix.json").toFile(), ModConfig.class);
-
 	@Expose
 	@Category(name = "Dungeon", desc = "Dungeon settings")
 	public DungeonConfig dungeon = new DungeonConfig();
@@ -22,16 +20,22 @@ public class ModConfig extends Config {
 	public MiscellaneousConfig miscellaneous = new MiscellaneousConfig();
 
 	public static ManagedConfig<ModConfig> managed() {
-		return MANAGED;
+		return Holder.MANAGED;
 	}
 
 	public static ModConfig get() {
-		return MANAGED.getInstance();
+		return Holder.MANAGED.getInstance();
 	}
 
 	@Override
 	public StructuredText getTitle() {
 		return StructuredText.of("AugmaSkyblockFixes");
+	}
+
+	private static final class Holder {
+
+		private static final ManagedConfig<ModConfig> MANAGED = ManagedConfig.create(FabricLoader.getInstance().getConfigDir().resolve("augmaskyblockfix.json").toFile(), ModConfig.class);
+
 	}
 
 }
