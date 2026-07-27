@@ -1,36 +1,37 @@
 package fr.augma.augmaskyblockfix.client.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.augma.augmaskyblockfix.client.config.ModConfig;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ShapeRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.Shapes;
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.awt.Color;
-
 @Mixin(EntityRenderer.class)
 public abstract class EntityRendererMixin {
 
-    @Inject(method = "render", at = @At("TAIL"))
-    private void renderBatHitbox(EntityRenderState state, PoseStack poseStack, MultiBufferSource bufferSource, int light, CallbackInfo ci) {
-        if (state.entityType != EntityType.BAT || !ModConfig.get().isBatHitboxEnabled()) {
+    @Inject(method = "submit", at = @At("TAIL"))
+    private void renderBatHitbox(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
+        if (state.entityType != EntityType.BAT || !ModConfig.get().getDungeon().getBat().isHitboxEnabled()) {
             return;
         }
 
         final AABB relativeBox = new AABB(-state.boundingBoxWidth / 2, 0, -state.boundingBoxWidth / 2, state.boundingBoxWidth / 2, state.boundingBoxHeight, state.boundingBoxWidth / 2);
-        final Color hitboxColor = ModConfig.get().getBatHitboxColor();
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.lines());
-        ShapeRenderer.renderLineBox(poseStack, vertexConsumer, relativeBox, hitboxColor.getRed() / 255.0F, hitboxColor.getGreen() / 255.0F, hitboxColor.getBlue() / 255.0F, 1.0F);
+        final int packedColor = ModConfig.get().getDungeon().getBat().getHitboxRgb();
+        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.lines(), (pose, vertexConsumer) -> Shapes.create(relativeBox).forAllEdges((x1, y1, z1, x2, y2, z2) -> {
+            final Vector3f normal = new Vector3f((float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1)).normalize();
+            vertexConsumer.addVertex(pose, (float) x1, (float) y1, (float) z1).setColor(packedColor).setNormal(pose, normal).setLineWidth(2.5F);
+            vertexConsumer.addVertex(pose, (float) x2, (float) y2, (float) z2).setColor(packedColor).setNormal(pose, normal).setLineWidth(2.5F);
+        }));
     }
 
 }

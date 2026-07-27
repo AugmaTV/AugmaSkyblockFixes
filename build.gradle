@@ -1,6 +1,12 @@
 plugins {
-    id 'fabric-loom' version '1.13.6'
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+    id 'com.gradleup.shadow' version '9.6.1'
     id 'maven-publish'
+}
+
+configurations {
+    shadowImpl
+    implementation.extendsFrom shadowImpl
 }
 
 version = project.mod_version
@@ -11,6 +17,8 @@ base {
 }
 
 loom {
+    accessWidenerPath = file("src/main/resources/moulconfig.accesswidener")
+
     splitEnvironmentSourceSets()
 
     mods {
@@ -33,23 +41,24 @@ repositories {
     // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html
     // for more information about repositories.
-    maven { url = "https://maven.isxander.dev/releases" }
+    maven { url = "https://maven.notenoughupdates.org/releases" }
     maven { url = "https://maven.terraformersmc.com/releases" }
 }
 
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    annotationProcessor "org.projectlombok:lombok:1.18.42"
-    implementation "org.projectlombok:lombok:1.18.42"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    annotationProcessor "org.projectlombok:lombok:1.18.46"
+    implementation "org.projectlombok:lombok:1.18.46"
 
-    modImplementation "net.fabricmc.fabric-api:fabric-api:0.126.0+1.21.5"
-    modImplementation("dev.isxander:yet-another-config-lib:3.8.1+1.21.5-fabric") {
-        exclude group: "com.twelvemonkeys.imageio"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    implementation "net.fabricmc:fabric-language-kotlin:${project.flk_version}"
+    shadowImpl("org.notenoughupdates.moulconfig:modern-${project.minecraft_version}:${project.moulconfig_version}") {
+        exclude group: "org.jetbrains.kotlin"
+        exclude group: "org.jetbrains.kotlinx"
     }
-    modImplementation "com.terraformersmc:modmenu:14.0.0"
+    implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 processResources {
@@ -65,7 +74,7 @@ processResources {
     }
 }
 
-def targetJavaVersion = 21
+def targetJavaVersion = 25
 tasks.withType(JavaCompile).configureEach {
     // ensure that the encoding is set to UTF-8, no matter what the system default is
     // this fixes some edge cases with special characters not displaying correctly
@@ -89,10 +98,26 @@ java {
 }
 
 jar {
+    archiveClassifier = "dev"
+
     from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
+        rename { "${it}_${project.archives_base_name}" }
     }
 }
+
+shadowJar {
+    archiveClassifier = ""
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from sourceSets.main.output
+    from sourceSets.client.output
+    configurations = [project.configurations.shadowImpl]
+    relocate "io.github.notenoughupdates.moulconfig", "fr.augma.augmaskyblockfix.deps.moulconfig"
+    mergeServiceFiles()
+    exclude "META-INF/*.kotlin_module"
+    exclude "META-INF/maven/**"
+}
+
+assemble.dependsOn shadowJar
 
 // configure the maven publication
 publishing {

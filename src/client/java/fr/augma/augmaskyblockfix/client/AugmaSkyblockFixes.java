@@ -9,7 +9,7 @@ public class AugmaSkyblockFixes implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ModConfig.HANDLER.load();
+        ModConfig.managed();
         
         // Register client commands
         ClientCommandRegistrationCallback.EVENT.register(ConfigCommand::register);

@@ -15,8 +15,8 @@ public abstract class LivingEntityRendererMixin {
 
     @Inject(method = "scale", at = @At("HEAD"))
     private void scale(LivingEntityRenderState renderState, PoseStack poseStack, CallbackInfo ci) {
-        if (renderState.entityType == EntityType.BAT && ModConfig.get().isBatScaleEnabled()) {
-            final float scale = ModConfig.get().getBatScaleSize();
+        if (renderState.entityType == EntityType.BAT && ModConfig.get().getDungeon().getBat().isScaleEnabled()) {
+            final float scale = ModConfig.get().getDungeon().getBat().getScaleSize();
             final float yOffset = renderState.boundingBoxHeight * (scale - 1.0F) * 0.5F;
             poseStack.translate(0.0F, yOffset, 0.0F);
             poseStack.scale(scale, scale, scale);
