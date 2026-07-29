@@ -14,8 +14,6 @@ public class RadialSlices implements GuiElementRenderState {
 
 	private static final float SCALE = 130F;
 
-	private static final float GAP = (float) Math.toRadians(4.0);
-
 	private static final float HOVER_GROWTH = 2F;
 
 	private final Matrix3x2f pose;
@@ -32,19 +30,22 @@ public class RadialSlices implements GuiElementRenderState {
 
 	private final float outer;
 
+	private final float gap;
+
 	private final int color;
 
 	private final int hoverColor;
 
 	private final int hovered;
 
-	public RadialSlices(final Matrix3x2fc pose, final int centerX, final int centerY, final int count, final float inner, final float outer, final int color, final int hoverColor, final int hovered) {
+	public RadialSlices(final Matrix3x2fc pose, final int centerX, final int centerY, final int count, final float inner, final float outer, final float gap, final int color, final int hoverColor, final int hovered) {
 		this.pose = new Matrix3x2f(pose);
 		this.centerX = centerX;
 		this.centerY = centerY;
 		this.count = count;
 		this.inner = inner;
 		this.outer = outer;
+		this.gap = gap;
 		this.color = color;
 		this.hoverColor = hoverColor;
 		this.hovered = hovered;
@@ -75,17 +76,8 @@ public class RadialSlices implements GuiElementRenderState {
 
 	@Override
 	public void buildVertices(final VertexConsumer consumer) {
-		final float step = (float) (Math.PI * 2 / this.count);
-		final float offset = (float) (-Math.PI / 2 - step / 2);
-
 		for (int index = 0; index < this.count; index++) {
-			final float start = index * step + GAP * 0.5F + offset;
-			final float end = (index + 1) * step - GAP * 0.5F + offset;
-
-			final float cosStart = Mth.cos(start);
-			final float sinStart = Mth.sin(start);
-			final float cosEnd = Mth.cos(end);
-			final float sinEnd = Mth.sin(end);
+			final float[] angles = anglesOf(this.count, index, this.gap);
 
 			final boolean isHovered = index == this.hovered;
 			final float growth = isHovered ? HOVER_GROWTH : 0F;
@@ -94,15 +86,15 @@ public class RadialSlices implements GuiElementRenderState {
 			final int slice = isHovered ? this.hoverColor : this.color;
 
 			quad(consumer, this.pose, slice,
-					this.centerX + outerRadius * cosStart, this.centerY + outerRadius * sinStart,
-					this.centerX + innerRadius * cosStart, this.centerY + innerRadius * sinStart,
-					this.centerX + innerRadius * cosEnd, this.centerY + innerRadius * sinEnd,
-					this.centerX + outerRadius * cosEnd, this.centerY + outerRadius * sinEnd);
+					this.centerX + outerRadius * angles[0], this.centerY + outerRadius * angles[1],
+					this.centerX + innerRadius * angles[0], this.centerY + innerRadius * angles[1],
+					this.centerX + innerRadius * angles[2], this.centerY + innerRadius * angles[3],
+					this.centerX + outerRadius * angles[2], this.centerY + outerRadius * angles[3]);
 		}
 	}
 
-	public static int[] centerOf(final int centerX, final int centerY, final int count, final float inner, final float outer, final int index) {
-		final float[] angles = anglesOf(count, index);
+	public static int[] centerOf(final int centerX, final int centerY, final int count, final float inner, final float outer, final float gap, final int index) {
+		final float[] angles = anglesOf(count, index, gap);
 		final float innerRadius = inner / 100F * SCALE;
 		final float outerRadius = outer / 100F * SCALE;
 
@@ -111,8 +103,8 @@ public class RadialSlices implements GuiElementRenderState {
 		return new int[]{Math.round(centerX + x), Math.round(centerY + y)};
 	}
 
-	public static int hitTest(final float mouseX, final float mouseY, final int centerX, final int centerY, final int count, final float inner, final float outer, final boolean generalDirection) {
-		final int direct = hitTest(mouseX, mouseY, centerX, centerY, count, inner, outer);
+	public static int hitTest(final float mouseX, final float mouseY, final int centerX, final int centerY, final int count, final float inner, final float outer, final float gap, final boolean generalDirection) {
+		final int direct = hitTest(mouseX, mouseY, centerX, centerY, count, inner, outer, gap);
 		if (direct != -1 || !generalDirection) {
 			return direct;
 		}
@@ -132,12 +124,12 @@ public class RadialSlices implements GuiElementRenderState {
 		return (int) (angle / step) % count;
 	}
 
-	public static int hitTest(final float mouseX, final float mouseY, final int centerX, final int centerY, final int count, final float inner, final float outer) {
+	public static int hitTest(final float mouseX, final float mouseY, final int centerX, final int centerY, final int count, final float inner, final float outer, final float gap) {
 		final float innerRadius = inner / 100F * SCALE;
 		final float outerRadius = outer / 100F * SCALE;
 
 		for (int index = 0; index < count; index++) {
-			final float[] angles = anglesOf(count, index);
+			final float[] angles = anglesOf(count, index, gap);
 			final float x0 = centerX + outerRadius * angles[0];
 			final float y0 = centerY + outerRadius * angles[1];
 			final float x1 = centerX + innerRadius * angles[0];
@@ -154,11 +146,12 @@ public class RadialSlices implements GuiElementRenderState {
 		return -1;
 	}
 
-	private static float[] anglesOf(final int count, final int index) {
+	private static float[] anglesOf(final int count, final int index, final float gap) {
 		final float step = (float) (Math.PI * 2 / count);
 		final float offset = (float) (-Math.PI / 2 - step / 2);
-		final float start = index * step + GAP * 0.5F + offset;
-		final float end = (index + 1) * step - GAP * 0.5F + offset;
+		final float gapRadians = (float) Math.toRadians(gap);
+		final float start = index * step + gapRadians * 0.5F + offset;
+		final float end = (index + 1) * step - gapRadians * 0.5F + offset;
 		return new float[]{Mth.cos(start), Mth.sin(start), Mth.cos(end), Mth.sin(end)};
 	}
 

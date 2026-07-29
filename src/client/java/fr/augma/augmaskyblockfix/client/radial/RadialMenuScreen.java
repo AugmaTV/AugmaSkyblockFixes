@@ -122,15 +122,16 @@ public class RadialMenuScreen extends Screen {
 		final int slices = Math.max(MINIMUM_SLICES, this.children.size());
 		final float outer = radial.getOuterRadius();
 		final float inner = Math.min(radial.getInnerRadius(), outer - 1F);
+		final float gap = radial.getSliceGap();
 
 		final int deltaX = mouseX - centerX;
 		final int deltaY = mouseY - centerY;
 		final int distanceSquared = deltaX * deltaX + deltaY * deltaY;
 		this.centerActive = distanceSquared < CENTER_ACTIVE_RADIUS_SQUARED;
 		this.centerHovered = distanceSquared < CENTER_HOVER_RADIUS_SQUARED;
-		this.hovered = this.centerActive ? -1 : RadialSlices.hitTest(mouseX, mouseY, centerX, centerY, slices, inner, outer, radial.isGeneralDirection());
+		this.hovered = this.centerActive ? -1 : RadialSlices.hitTest(mouseX, mouseY, centerX, centerY, slices, inner, outer, gap, radial.isGeneralDirection());
 
-		gui.guiRenderState.addGuiElement(new RadialSlices(gui.pose(), centerX, centerY, slices, inner, outer, radial.sliceRgb(), radial.hoverRgb(), this.hovered));
+		gui.guiRenderState.addGuiElement(new RadialSlices(gui.pose(), centerX, centerY, slices, inner, outer, gap, radial.sliceRgb(), radial.hoverRgb(), this.hovered));
 		gui.nextStratum();
 
 		for (int index = 0; index < this.children.size(); index++) {
@@ -139,7 +140,7 @@ public class RadialMenuScreen extends Screen {
 				continue;
 			}
 
-			final int[] center = RadialSlices.centerOf(centerX, centerY, slices, inner, outer, index);
+			final int[] center = RadialSlices.centerOf(centerX, centerY, slices, inner, outer, gap, index);
 			gui.item(entry.stack(), center[0] - 8, center[1] - 8);
 		}
 

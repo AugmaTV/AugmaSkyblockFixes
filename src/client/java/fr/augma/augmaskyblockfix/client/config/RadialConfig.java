@@ -74,6 +74,11 @@ public class RadialConfig {
 	public float outerRadius = 80F;
 
 	@Expose
+	@ConfigOption(name = "Slice gap", desc = "Angular gap between the slices, in degrees")
+	@ConfigEditorSlider(minValue = 0F, maxValue = 20F, minStep = 0.5F)
+	public float sliceGap = 4F;
+
+	@Expose
 	public Map<String, ShortcutConfig> entries = new LinkedHashMap<>();
 
 	@ConfigOption(name = "New shortcut", desc = "Path of the shortcut to add. Use a slash to nest it, for example warps/hub")
