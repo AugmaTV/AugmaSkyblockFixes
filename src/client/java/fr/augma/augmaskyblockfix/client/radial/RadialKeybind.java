@@ -7,11 +7,13 @@ import net.minecraft.client.Minecraft;
 
 public class RadialKeybind {
 
+	private static final int MINIMUM_KEY = 32;
+
 	private static boolean wasDown;
 
 	public static void tick(final Minecraft minecraft) {
 		final RadialConfig radial = ModConfig.get().getRadial();
-		if (!radial.isEnabled() || minecraft.level == null) {
+		if (!radial.isEnabled() || radial.getKeybind() < MINIMUM_KEY || minecraft.level == null) {
 			wasDown = false;
 			return;
 		}
@@ -28,7 +30,7 @@ public class RadialKeybind {
 				RadialMenuScreen.open("");
 			}
 		} else if (!down && wasDown && screen != null && radial.isHoldToOpen()) {
-			if (!screen.activateHovered()) {
+			if (!screen.releaseHovered()) {
 				RadialMenuScreen.close();
 			}
 		}
