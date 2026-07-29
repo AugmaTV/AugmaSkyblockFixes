@@ -10,7 +10,7 @@ import java.util.List;
 
 public class DynamicRadialCategory {
 
-	private static final String[] SETTING_FIELDS = {"enabled", "keybind", "holdToOpen", "background", "blur", "generalDirection", "sliceColour", "hoverColour", "innerRadius", "outerRadius"};
+	private static final String[] SETTING_FIELDS = {"enabled", "keybind", "holdToOpen", "background", "blur", "generalDirection", "sliceColour", "hoverColour", "innerRadius", "outerRadius", "sliceGap"};
 
 	private static final String[] OPTION_FIELDS = {"label", "icon", "command", "remove"};
 
