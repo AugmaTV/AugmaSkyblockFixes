@@ -12,7 +12,7 @@ public class DynamicRadialCategory {
 
 	private static final String[] SETTING_FIELDS = {"enabled", "keybind", "holdToOpen", "background", "blur", "generalDirection", "sliceColour", "hoverColour", "innerRadius", "outerRadius", "centreDistance", "sliceGap"};
 
-	private static final String[] OPTION_FIELDS = {"label", "icon", "command", "remove"};
+	private static final String[] OPTION_FIELDS = {"label", "icon", "texture", "command", "remove"};
 
 	private static final int ACCORDION_BASE = 600000;
 
