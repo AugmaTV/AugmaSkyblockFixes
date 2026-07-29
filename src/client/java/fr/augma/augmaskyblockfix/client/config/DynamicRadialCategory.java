@@ -10,6 +10,8 @@ import java.util.List;
 
 public class DynamicRadialCategory {
 
+	private static final String[] SETTING_FIELDS = {"enabled", "keybind", "holdToOpen", "background", "blur", "sliceColour", "hoverColour", "innerRadius", "outerRadius"};
+
 	private static final String[] OPTION_FIELDS = {"label", "icon", "command", "remove"};
 
 	private static final int ACCORDION_BASE = 600000;
@@ -17,15 +19,15 @@ public class DynamicRadialCategory {
 	public static void install(final MoulConfigProcessor<ModConfig> processor, final RadialConfig config) {
 		try {
 			final Field anchor = RadialConfig.class.getDeclaredField("entries");
-			final Field enabled = RadialConfig.class.getDeclaredField("enabled");
-			final Field keybind = RadialConfig.class.getDeclaredField("keybind");
 			final Field newShortcut = RadialConfig.class.getDeclaredField("newShortcut");
 			final Field add = RadialConfig.class.getDeclaredField("add");
 			final Field accordionAnchor = ShortcutConfig.class.getDeclaredField(OPTION_FIELDS[0]);
 
 			processor.beginCategory(config, anchor, "Radial menu", "Command shortcuts on a radial menu");
-			processor.emitOption(config, enabled, enabled.getAnnotation(ConfigOption.class));
-			processor.emitOption(config, keybind, keybind.getAnnotation(ConfigOption.class));
+			for (final String name : SETTING_FIELDS) {
+				final Field field = RadialConfig.class.getDeclaredField(name);
+				processor.emitOption(config, field, field.getAnnotation(ConfigOption.class));
+			}
 			processor.emitOption(config, newShortcut, newShortcut.getAnnotation(ConfigOption.class));
 			processor.emitOption(config, add, new DynamicOption("Add", "Create the shortcut at the path above"));
 

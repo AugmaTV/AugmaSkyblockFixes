@@ -1,8 +1,8 @@
 package fr.augma.augmaskyblockfix.client.radial;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import fr.augma.augmaskyblockfix.client.config.RadialConfig;
 import fr.augma.augmaskyblockfix.client.config.ModConfig;
+import fr.augma.augmaskyblockfix.client.config.RadialConfig;
 import net.minecraft.client.Minecraft;
 
 public class RadialKeybind {
@@ -17,9 +17,20 @@ public class RadialKeybind {
 		}
 
 		final boolean down = InputConstants.isKeyDown(minecraft.getWindow(), radial.getKeybind());
-		if (down && !wasDown && minecraft.mouseHandler.isMouseGrabbed()) {
-			RadialMenuScreen.open("");
+		final RadialMenuScreen screen = RadialMenuScreen.getCurrent();
+
+		if (down && !wasDown) {
+			if (screen != null) {
+				if (!radial.isHoldToOpen()) {
+					minecraft.setScreenAndShow(null);
+				}
+			} else if (minecraft.mouseHandler.isMouseGrabbed()) {
+				RadialMenuScreen.open("");
+			}
+		} else if (!down && wasDown && screen != null && radial.isHoldToOpen()) {
+			screen.activateHovered();
 		}
+
 		wasDown = down;
 	}
 
