@@ -111,6 +111,27 @@ public class RadialSlices implements GuiElementRenderState {
 		return new int[]{Math.round(centerX + x), Math.round(centerY + y)};
 	}
 
+	public static int hitTest(final float mouseX, final float mouseY, final int centerX, final int centerY, final int count, final float inner, final float outer, final boolean generalDirection) {
+		final int direct = hitTest(mouseX, mouseY, centerX, centerY, count, inner, outer);
+		if (direct != -1 || !generalDirection) {
+			return direct;
+		}
+
+		final float deltaX = mouseX - centerX;
+		final float deltaY = mouseY - centerY;
+		if (deltaX == 0F && deltaY == 0F) {
+			return -1;
+		}
+
+		final float step = (float) (Math.PI * 2 / count);
+		final float offset = (float) (-Math.PI / 2 - step / 2);
+		double angle = Math.atan2(deltaY, deltaX) - offset;
+		while (angle < 0) {
+			angle += Math.PI * 2;
+		}
+		return (int) (angle / step) % count;
+	}
+
 	public static int hitTest(final float mouseX, final float mouseY, final int centerX, final int centerY, final int count, final float inner, final float outer) {
 		final float innerRadius = inner / 100F * SCALE;
 		final float outerRadius = outer / 100F * SCALE;

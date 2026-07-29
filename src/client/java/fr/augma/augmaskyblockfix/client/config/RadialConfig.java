@@ -49,24 +49,29 @@ public class RadialConfig {
 	public boolean blur = false;
 
 	@Expose
+	@ConfigOption(name = "General direction click", desc = "When the cursor is not on a slice, pick the slice closest to the cursor direction")
+	@ConfigEditorBoolean
+	public boolean generalDirection = false;
+
+	@Expose
 	@ConfigOption(name = "Slice colour", desc = "Colour of the menu slices")
 	@ConfigEditorColour
-	public String sliceColour = ChromaColour.special(0, 220, 30, 30, 46);
+	public String sliceColour = ChromaColour.special(0, 128, 49, 50, 68);
 
 	@Expose
 	@ConfigOption(name = "Hover colour", desc = "Colour of the slice under the cursor")
 	@ConfigEditorColour
-	public String hoverColour = ChromaColour.special(0, 255, 137, 180, 250);
+	public String hoverColour = ChromaColour.special(0, 128, 203, 166, 247);
 
 	@Expose
 	@ConfigOption(name = "Inner radius", desc = "Inner radius of the ring, in percent")
 	@ConfigEditorSlider(minValue = 10F, maxValue = 60F, minStep = 1F)
-	public float innerRadius = 30F;
+	public float innerRadius = 50F;
 
 	@Expose
 	@ConfigOption(name = "Outer radius", desc = "Outer radius of the ring, in percent")
 	@ConfigEditorSlider(minValue = 20F, maxValue = 90F, minStep = 1F)
-	public float outerRadius = 55F;
+	public float outerRadius = 80F;
 
 	@Expose
 	public Map<String, ShortcutConfig> entries = new LinkedHashMap<>();
