@@ -18,6 +18,8 @@ public class RadialMenuScreen extends Screen {
 
 	private static final int CENTER_HALF = 12;
 
+	private static final int CENTER_ACTIVE_RADIUS_SQUARED = 225;
+
 	private static final int CENTER_HOVER_RADIUS_SQUARED = 144;
 
 	private static final int MAUVE = 0xFFCBA6F7;
@@ -45,6 +47,8 @@ public class RadialMenuScreen extends Screen {
 
 	private boolean centerHovered;
 
+	private boolean centerActive;
+
 	private RadialMenuScreen(final String path) {
 		super(Component.literal("Radial menu"));
 		this.path = path;
@@ -57,22 +61,20 @@ public class RadialMenuScreen extends Screen {
 		}
 	}
 
-	public void activateHovered() {
-		if (this.centerHovered) {
+	public boolean activateHovered() {
+		if (this.centerActive) {
 			this.onClose();
-			return;
+			return true;
 		}
 
 		if (this.hovered < 0 || this.hovered >= this.children.size()) {
-			close();
-			return;
+			return false;
 		}
 
 		final String selected = this.children.get(this.hovered);
 		final ShortcutConfig entry = ModConfig.get().getRadial().getEntries().get(selected);
 		if (entry == null) {
-			close();
-			return;
+			return false;
 		}
 
 		if (entry.hasCommand()) {
@@ -81,9 +83,10 @@ public class RadialMenuScreen extends Screen {
 		} else {
 			open(selected);
 		}
+		return true;
 	}
 
-	private static void close() {
+	public static void close() {
 		Minecraft.getInstance().setScreenAndShow(null);
 	}
 
@@ -117,18 +120,18 @@ public class RadialMenuScreen extends Screen {
 		final int centerX = gui.guiWidth() / 2;
 		final int centerY = gui.guiHeight() / 2;
 		final int slices = Math.max(MINIMUM_SLICES, this.children.size());
-		final float inner = radial.getInnerRadius();
 		final float outer = radial.getOuterRadius();
+		final float inner = Math.min(radial.getInnerRadius(), outer - 1F);
 
 		final int deltaX = mouseX - centerX;
 		final int deltaY = mouseY - centerY;
-		this.centerHovered = deltaX * deltaX + deltaY * deltaY < CENTER_HOVER_RADIUS_SQUARED;
-		this.hovered = this.centerHovered ? -1 : RadialSlices.hitTest(mouseX, mouseY, centerX, centerY, slices, inner, outer, radial.isGeneralDirection());
-		if (this.hovered >= this.children.size()) {
-			this.hovered = -1;
-		}
+		final int distanceSquared = deltaX * deltaX + deltaY * deltaY;
+		this.centerActive = distanceSquared < CENTER_ACTIVE_RADIUS_SQUARED;
+		this.centerHovered = distanceSquared < CENTER_HOVER_RADIUS_SQUARED;
+		this.hovered = this.centerActive ? -1 : RadialSlices.hitTest(mouseX, mouseY, centerX, centerY, slices, inner, outer, radial.isGeneralDirection());
 
 		gui.guiRenderState.addGuiElement(new RadialSlices(gui.pose(), centerX, centerY, slices, inner, outer, radial.sliceRgb(), radial.hoverRgb(), this.hovered));
+		gui.nextStratum();
 
 		for (int index = 0; index < this.children.size(); index++) {
 			final ShortcutConfig entry = radial.getEntries().get(this.children.get(index));
@@ -145,12 +148,11 @@ public class RadialMenuScreen extends Screen {
 	}
 
 	private void renderCenterButton(final GuiGraphicsExtractor gui, final int centerX, final int centerY) {
-		final boolean back = !this.path.isEmpty();
-		final String glyph = back ? "←" : "✕";
+		final String glyph = this.path.isEmpty() ? "✕" : "←";
 
 		gui.fill(centerX - CENTER_HALF, centerY - CENTER_HALF, centerX + CENTER_HALF, centerY + CENTER_HALF, this.centerHovered ? SURFACE2 : SURFACE1);
-		gui.outline(centerX - CENTER_HALF, centerY - CENTER_HALF, CENTER_HALF * 2, CENTER_HALF * 2, this.centerHovered ? MAUVE : OVERLAY0);
-		gui.text(this.font, Component.literal(glyph), centerX - this.font.width(glyph) / 2, centerY - this.font.lineHeight / 2, this.centerHovered ? MAUVE : SUBTEXT0);
+		border(gui, centerX - CENTER_HALF, centerY - CENTER_HALF, CENTER_HALF * 2, CENTER_HALF * 2, this.centerHovered ? MAUVE : OVERLAY0);
+		gui.text(this.font, Component.literal(glyph), centerX - this.font.width(glyph) / 2, centerY - this.font.lineHeight / 2, this.centerHovered ? MAUVE : SUBTEXT0, false);
 	}
 
 	private void renderLabel(final GuiGraphicsExtractor gui, final int mouseX, final int mouseY) {
@@ -164,8 +166,8 @@ public class RadialMenuScreen extends Screen {
 		final int y = mouseY - 4;
 
 		gui.fill(x - 5, y - 5, x + width + 5, y + this.font.lineHeight + 5, BASE);
-		gui.outline(x - 5, y - 5, width + 10, this.font.lineHeight + 10, MAUVE);
-		gui.text(this.font, Component.literal(label), x, y, TEXT);
+		border(gui, x - 5, y - 5, width + 10, this.font.lineHeight + 10, MAUVE);
+		gui.text(this.font, Component.literal(label), x, y, TEXT, false);
 	}
 
 	private String labelFor() {
@@ -183,6 +185,13 @@ public class RadialMenuScreen extends Screen {
 		}
 		final String raw = entry.getLabel().get();
 		return raw.isEmpty() ? RadialConfig.nameOf(selected) : raw;
+	}
+
+	private static void border(final GuiGraphicsExtractor gui, final int x, final int y, final int width, final int height, final int color) {
+		gui.fill(x - 1, y - 1, x + width + 1, y, color);
+		gui.fill(x - 1, y + height, x + width + 1, y + height + 1, color);
+		gui.fill(x - 1, y, x, y + height, color);
+		gui.fill(x + width, y, x + width + 1, y + height, color);
 	}
 
 	@Override
