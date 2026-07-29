@@ -28,7 +28,9 @@ public class RadialKeybind {
 				RadialMenuScreen.open("");
 			}
 		} else if (!down && wasDown && screen != null && radial.isHoldToOpen()) {
-			screen.activateHovered();
+			if (!screen.activateHovered()) {
+				RadialMenuScreen.close();
+			}
 		}
 
 		wasDown = down;
