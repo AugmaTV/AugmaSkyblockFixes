@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.lwjgl.glfw.GLFW;
 
@@ -44,7 +45,7 @@ public class RadialConfig {
 	public String background = ChromaColour.special(0, 120, 0, 0, 0);
 
 	@Expose
-	@ConfigOption(name = "Blur background", desc = "Blur the game behind the menu")
+	@ConfigOption(name = "Blur background", desc = "Blur the game behind the menu. Requires the vanilla Menu Background Blurriness setting to be above Off")
 	@ConfigEditorBoolean
 	public boolean blur = false;
 
@@ -56,12 +57,12 @@ public class RadialConfig {
 	@Expose
 	@ConfigOption(name = "Slice colour", desc = "Colour of the menu slices")
 	@ConfigEditorColour
-	public String sliceColour = ChromaColour.special(0, 128, 49, 50, 68);
+	public String sliceColour = ChromaColour.special(0, 127, 49, 50, 68);
 
 	@Expose
 	@ConfigOption(name = "Hover colour", desc = "Colour of the slice under the cursor")
 	@ConfigEditorColour
-	public String hoverColour = ChromaColour.special(0, 128, 203, 166, 247);
+	public String hoverColour = ChromaColour.special(0, 127, 203, 166, 247);
 
 	@Expose
 	@ConfigOption(name = "Inner radius", desc = "Inner radius of the ring, in percent")
@@ -72,6 +73,11 @@ public class RadialConfig {
 	@ConfigOption(name = "Outer radius", desc = "Outer radius of the ring, in percent")
 	@ConfigEditorSlider(minValue = 20F, maxValue = 90F, minStep = 1F)
 	public float outerRadius = 80F;
+
+	@Expose
+	@ConfigOption(name = "Centre distance", desc = "Extra distance between the centre button and the ring, in percent. Moves the whole ring without changing its thickness")
+	@ConfigEditorSlider(minValue = 0F, maxValue = 40F, minStep = 1F)
+	public float centreDistance = 0F;
 
 	@Expose
 	@ConfigOption(name = "Slice gap", desc = "Angular gap between the slices, in degrees")
@@ -99,16 +105,46 @@ public class RadialConfig {
 		return children;
 	}
 
+	@Getter(AccessLevel.NONE)
+	private transient String parsedBackground;
+
+	@Getter(AccessLevel.NONE)
+	private transient ChromaColour backgroundChroma;
+
+	@Getter(AccessLevel.NONE)
+	private transient String parsedSlice;
+
+	@Getter(AccessLevel.NONE)
+	private transient ChromaColour sliceChroma;
+
+	@Getter(AccessLevel.NONE)
+	private transient String parsedHover;
+
+	@Getter(AccessLevel.NONE)
+	private transient ChromaColour hoverChroma;
+
 	public int backgroundRgb() {
-		return ChromaColour.forLegacyString(this.background).getEffectiveColourRGB();
+		if (!this.background.equals(this.parsedBackground)) {
+			this.parsedBackground = this.background;
+			this.backgroundChroma = ChromaColour.forLegacyString(this.background);
+		}
+		return this.backgroundChroma.getEffectiveColourRGB();
 	}
 
 	public int sliceRgb() {
-		return ChromaColour.forLegacyString(this.sliceColour).getEffectiveColourRGB();
+		if (!this.sliceColour.equals(this.parsedSlice)) {
+			this.parsedSlice = this.sliceColour;
+			this.sliceChroma = ChromaColour.forLegacyString(this.sliceColour);
+		}
+		return this.sliceChroma.getEffectiveColourRGB();
 	}
 
 	public int hoverRgb() {
-		return ChromaColour.forLegacyString(this.hoverColour).getEffectiveColourRGB();
+		if (!this.hoverColour.equals(this.parsedHover)) {
+			this.parsedHover = this.hoverColour;
+			this.hoverChroma = ChromaColour.forLegacyString(this.hoverColour);
+		}
+		return this.hoverChroma.getEffectiveColourRGB();
 	}
 
 	public static String parentOf(final String path) {

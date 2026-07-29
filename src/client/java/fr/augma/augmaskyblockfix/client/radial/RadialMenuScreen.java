@@ -61,7 +61,38 @@ public class RadialMenuScreen extends Screen {
 		}
 	}
 
+	private void resolveHover(final float mouseX, final float mouseY, final int centerX, final int centerY, final int slices, final float inner, final float outer, final float gap, final boolean generalDirection) {
+		final float deltaX = mouseX - centerX;
+		final float deltaY = mouseY - centerY;
+		final float distanceSquared = deltaX * deltaX + deltaY * deltaY;
+		this.centerActive = distanceSquared < CENTER_ACTIVE_RADIUS_SQUARED;
+		this.centerHovered = distanceSquared < CENTER_HOVER_RADIUS_SQUARED;
+		this.hovered = this.centerActive ? -1 : RadialSlices.hitTest(mouseX, mouseY, centerX, centerY, slices, inner, outer, gap, generalDirection);
+	}
+
+	private void refreshHover() {
+		final Minecraft minecraft = Minecraft.getInstance();
+		final RadialConfig radial = ModConfig.get().getRadial();
+		final float mouseX = (float) minecraft.mouseHandler.getScaledXPos(minecraft.getWindow());
+		final float mouseY = (float) minecraft.mouseHandler.getScaledYPos(minecraft.getWindow());
+		final float distance = radial.getCentreDistance();
+		final float outer = radial.getOuterRadius() + distance;
+		final float inner = Math.min(radial.getInnerRadius() + distance, outer - 1F);
+
+		this.resolveHover(mouseX, mouseY, this.width / 2, this.height / 2, Math.max(MINIMUM_SLICES, this.children.size()), inner, outer, radial.getSliceGap(), radial.isGeneralDirection());
+	}
+
+	public boolean releaseHovered() {
+		this.refreshHover();
+		if (this.centerActive) {
+			close();
+			return true;
+		}
+		return this.activateHovered();
+	}
+
 	public boolean activateHovered() {
+		this.refreshHover();
 		if (this.centerActive) {
 			this.onClose();
 			return true;
@@ -80,9 +111,12 @@ public class RadialMenuScreen extends Screen {
 		if (entry.hasCommand()) {
 			close();
 			RadialActions.run(entry.getCommand().get());
-		} else {
-			open(selected);
+			return true;
 		}
+		if (ModConfig.get().getRadial().childrenOf(selected).isEmpty()) {
+			return false;
+		}
+		open(selected);
 		return true;
 	}
 
@@ -106,7 +140,7 @@ public class RadialMenuScreen extends Screen {
 	@Override
 	public void extractBackground(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTick) {
 		final RadialConfig radial = ModConfig.get().getRadial();
-		if (radial.isBlur()) {
+		if (radial.isBlur() && Minecraft.getInstance().options.getMenuBackgroundBlurriness() > 0) {
 			graphics.blurBeforeThisStratum();
 		}
 		graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), radial.backgroundRgb());
@@ -120,16 +154,12 @@ public class RadialMenuScreen extends Screen {
 		final int centerX = gui.guiWidth() / 2;
 		final int centerY = gui.guiHeight() / 2;
 		final int slices = Math.max(MINIMUM_SLICES, this.children.size());
-		final float outer = radial.getOuterRadius();
-		final float inner = Math.min(radial.getInnerRadius(), outer - 1F);
+		final float distance = radial.getCentreDistance();
+		final float outer = radial.getOuterRadius() + distance;
+		final float inner = Math.min(radial.getInnerRadius() + distance, outer - 1F);
 		final float gap = radial.getSliceGap();
 
-		final int deltaX = mouseX - centerX;
-		final int deltaY = mouseY - centerY;
-		final int distanceSquared = deltaX * deltaX + deltaY * deltaY;
-		this.centerActive = distanceSquared < CENTER_ACTIVE_RADIUS_SQUARED;
-		this.centerHovered = distanceSquared < CENTER_HOVER_RADIUS_SQUARED;
-		this.hovered = this.centerActive ? -1 : RadialSlices.hitTest(mouseX, mouseY, centerX, centerY, slices, inner, outer, gap, radial.isGeneralDirection());
+		this.resolveHover(mouseX, mouseY, centerX, centerY, slices, inner, outer, gap, radial.isGeneralDirection());
 
 		gui.guiRenderState.addGuiElement(new RadialSlices(gui.pose(), centerX, centerY, slices, inner, outer, gap, radial.sliceRgb(), radial.hoverRgb(), this.hovered));
 		gui.nextStratum();
@@ -197,8 +227,21 @@ public class RadialMenuScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(final MouseButtonEvent click, final boolean doubled) {
+		if (click.button() == 1) {
+			this.onClose();
+			return true;
+		}
 		this.activateHovered();
 		return true;
+	}
+
+	@Override
+	public boolean mouseReleased(MouseButtonEvent event) {
+		if (this.centerActive) {
+			return super.mouseReleased(event);
+		}
+		this.activateHovered();
+		return super.mouseReleased(event);
 	}
 
 	@Override
