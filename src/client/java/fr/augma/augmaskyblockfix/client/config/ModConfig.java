@@ -16,6 +16,9 @@ public class ModConfig extends Config {
 	public EntityConfig entities = new EntityConfig();
 
 	@Expose
+	public RadialConfig radial = new RadialConfig();
+
+	@Expose
 	@Category(name = "Miscellaneous", desc = "Miscellaneous settings")
 	public MiscellaneousConfig miscellaneous = new MiscellaneousConfig();
 
