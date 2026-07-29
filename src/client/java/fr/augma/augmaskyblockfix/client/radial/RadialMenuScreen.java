@@ -3,6 +3,7 @@ package fr.augma.augmaskyblockfix.client.radial;
 import fr.augma.augmaskyblockfix.client.config.ModConfig;
 import fr.augma.augmaskyblockfix.client.config.RadialConfig;
 import fr.augma.augmaskyblockfix.client.config.ShortcutConfig;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -13,17 +14,8 @@ import java.util.List;
 
 public class RadialMenuScreen extends Screen {
 
-	private static final int RADIUS = 70;
-
-	private static final int SLOT_HALF = 14;
-
-	private static final int DEAD_ZONE = 22;
-
-	private static final int BACKDROP = 0x88000000;
-
-	private static final int SLOT_COLOR = 0xAA202020;
-
-	private static final int HOVER_COLOR = 0xFFFFFFFF;
+	@Getter
+	private static RadialMenuScreen current;
 
 	private final String path;
 
@@ -31,7 +23,7 @@ public class RadialMenuScreen extends Screen {
 
 	private int hovered = -1;
 
-	public RadialMenuScreen(final String path) {
+	private RadialMenuScreen(final String path) {
 		super(Component.literal("Radial menu"));
 		this.path = path;
 		this.children = ModConfig.get().getRadial().childrenOf(path);
@@ -43,57 +35,86 @@ public class RadialMenuScreen extends Screen {
 		}
 	}
 
-	@Override
-	public void extractRenderState(final GuiGraphicsExtractor gui, final int mouseX, final int mouseY, final float partialTick) {
-		super.extractRenderState(gui, mouseX, mouseY, partialTick);
-
-		final int centerX = gui.guiWidth() / 2;
-		final int centerY = gui.guiHeight() / 2;
-		gui.fill(0, 0, gui.guiWidth(), gui.guiHeight(), BACKDROP);
-
-		this.hovered = hoveredIndex(mouseX - centerX, mouseY - centerY, this.children.size());
-
-		final RadialConfig radial = ModConfig.get().getRadial();
-		for (int index = 0; index < this.children.size(); index++) {
-			final ShortcutConfig entry = radial.getEntries().get(this.children.get(index));
-			if (entry == null) {
-				continue;
-			}
-
-			final double angle = angleOf(index, this.children.size());
-			final int slotX = centerX + (int) Math.round(Math.cos(angle) * RADIUS);
-			final int slotY = centerY + (int) Math.round(Math.sin(angle) * RADIUS);
-
-			gui.fill(slotX - SLOT_HALF, slotY - SLOT_HALF, slotX + SLOT_HALF, slotY + SLOT_HALF, SLOT_COLOR);
-			if (index == this.hovered) {
-				gui.outline(slotX - SLOT_HALF, slotY - SLOT_HALF, SLOT_HALF * 2, SLOT_HALF * 2, HOVER_COLOR);
-			}
-
-			gui.item(entry.stack(), slotX - 8, slotY - 8);
-
-			final String label = entry.getLabel().get().isEmpty() ? RadialConfig.nameOf(this.children.get(index)) : entry.getLabel().get();
-			gui.centeredText(this.font, Component.literal(label), slotX, slotY + SLOT_HALF + 2, -1);
-		}
-	}
-
-	@Override
-	public boolean mouseClicked(final MouseButtonEvent click, final boolean doubled) {
+	public void activateHovered() {
 		if (this.hovered < 0 || this.hovered >= this.children.size()) {
-			return super.mouseClicked(click, doubled);
+			close();
+			return;
 		}
 
 		final String selected = this.children.get(this.hovered);
 		final ShortcutConfig entry = ModConfig.get().getRadial().getEntries().get(selected);
 		if (entry == null) {
-			return super.mouseClicked(click, doubled);
+			close();
+			return;
 		}
 
 		if (entry.hasCommand()) {
-			this.onClose();
+			close();
 			RadialActions.run(entry.getCommand().get());
 		} else {
 			open(selected);
 		}
+	}
+
+	private static void close() {
+		Minecraft.getInstance().setScreenAndShow(null);
+	}
+
+	@Override
+	protected void init() {
+		current = this;
+	}
+
+	@Override
+	public void removed() {
+		super.removed();
+		if (current == this) {
+			current = null;
+		}
+	}
+
+	@Override
+	protected void extractBlurredBackground(final GuiGraphicsExtractor graphics) {
+		if (ModConfig.get().getRadial().isBlur()) {
+			super.extractBlurredBackground(graphics);
+		}
+	}
+
+	@Override
+	public void extractRenderState(final GuiGraphicsExtractor gui, final int mouseX, final int mouseY, final float partialTick) {
+		super.extractRenderState(gui, mouseX, mouseY, partialTick);
+
+		final RadialConfig radial = ModConfig.get().getRadial();
+		final int centerX = gui.guiWidth() / 2;
+		final int centerY = gui.guiHeight() / 2;
+		final int count = this.children.size();
+		if (count == 0) {
+			return;
+		}
+
+		gui.fill(0, 0, gui.guiWidth(), gui.guiHeight(), radial.backgroundRgb());
+		this.hovered = RadialSlices.hitTest(mouseX, mouseY, centerX, centerY, count, radial.getInnerRadius(), radial.getOuterRadius());
+
+		gui.guiRenderState.addGuiElement(new RadialSlices(gui.pose(), centerX, centerY, count, radial.getInnerRadius(), radial.getOuterRadius(), radial.sliceRgb(), radial.hoverRgb(), this.hovered));
+
+		for (int index = 0; index < count; index++) {
+			final ShortcutConfig entry = radial.getEntries().get(this.children.get(index));
+			if (entry == null) {
+				continue;
+			}
+
+			final int[] center = RadialSlices.centerOf(centerX, centerY, count, radial.getInnerRadius(), radial.getOuterRadius(), index);
+			gui.item(entry.stack(), center[0] - 8, center[1] - 12);
+
+			final String raw = entry.getLabel().get();
+			final String label = raw.isEmpty() ? RadialConfig.nameOf(this.children.get(index)) : raw;
+			gui.centeredText(this.font, Component.literal(label), center[0], center[1] + 4, -1);
+		}
+	}
+
+	@Override
+	public boolean mouseClicked(final MouseButtonEvent click, final boolean doubled) {
+		this.activateHovered();
 		return true;
 	}
 
@@ -110,23 +131,6 @@ public class RadialMenuScreen extends Screen {
 	@Override
 	public boolean isPauseScreen() {
 		return false;
-	}
-
-	private static double angleOf(final int index, final int count) {
-		return index * 2 * Math.PI / count - Math.PI / 2;
-	}
-
-	private static int hoveredIndex(final int deltaX, final int deltaY, final int count) {
-		if (count == 0 || Math.sqrt(deltaX * deltaX + deltaY * deltaY) < DEAD_ZONE) {
-			return -1;
-		}
-
-		double angle = Math.atan2(deltaY, deltaX) + Math.PI / 2;
-		while (angle < 0) {
-			angle += 2 * Math.PI;
-		}
-		final double slice = 2 * Math.PI / count;
-		return (int) Math.round(angle / slice) % count;
 	}
 
 }
