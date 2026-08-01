@@ -29,9 +29,7 @@ public class RadialKeybind {
 				RadialOverlay.open("");
 			}
 		} else if (!down && wasDown && RadialOverlay.isOpen() && radial.isHoldToOpen()) {
-			if (!RadialOverlay.activate()) {
-				RadialOverlay.close(true);
-			}
+			RadialOverlay.close(true);
 		}
 
 		wasDown = down;
