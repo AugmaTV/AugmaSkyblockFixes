@@ -141,7 +141,7 @@ publishing {
 publishMods {
     file = tasks.shadowJar.archiveFile
     version = "${project.mod_version}+${project.minecraft_version}"
-    displayName = "${project.mod_version} for Minecraft ${project.minecraft_version}"
+    displayName = project.mod_version
     changelog = providers.fileContents(layout.projectDirectory.file("CHANGELOG.md")).asText.orElse("")
     type = STABLE
     modLoaders.add("fabric")
