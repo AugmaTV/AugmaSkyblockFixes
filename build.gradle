@@ -1,6 +1,7 @@
 plugins {
     id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'com.gradleup.shadow' version '9.6.1'
+    id 'me.modmuss50.mod-publish-plugin' version '2.2.0'
     id 'maven-publish'
 }
 
@@ -134,5 +135,23 @@ publishing {
         // Notice: This block does NOT have the same function as the block in the top level.
         // The repositories here will be used for publishing your artifact, not for
         // retrieving dependencies.
+    }
+}
+
+publishMods {
+    file = tasks.shadowJar.archiveFile
+    version = "${project.mod_version}+${project.minecraft_version}"
+    displayName = "${project.mod_version} for Minecraft ${project.minecraft_version}"
+    changelog = providers.fileContents(layout.projectDirectory.file("CHANGELOG.md")).asText.orElse("")
+    type = STABLE
+    modLoaders.add("fabric")
+    dryRun = providers.gradleProperty("dryRun").present
+
+    modrinth {
+        projectId = project.modrinth_id
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        project.mc_targets.split(" ").each { minecraftVersions.add(it) }
+        requires("fabric-api", "fabric-language-kotlin")
+        optional("modmenu")
     }
 }
