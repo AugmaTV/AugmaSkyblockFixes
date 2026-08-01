@@ -17,6 +17,11 @@ public class MiscellaneousConfig {
 	public Property<Boolean> centeredPlants = Property.of(false);
 
 	@Expose
+	@ConfigOption(name = "Level gradient", desc = "Blend the skyblock level colour towards the next tier colour as the level progresses through its tier")
+	@ConfigEditorBoolean
+	public boolean levelGradient = false;
+
+	@Expose
 	@ConfigOption(name = "Copy item nbt", desc = "Press the key below while hovering an item in any container to copy its nbt to the clipboard")
 	@ConfigEditorBoolean
 	public boolean copyItemNbt = false;
