@@ -19,19 +19,18 @@ public class RadialKeybind {
 		}
 
 		final boolean down = InputConstants.isKeyDown(minecraft.getWindow(), radial.getKeybind());
-		final RadialMenuScreen screen = RadialMenuScreen.getCurrent();
 
 		if (down && !wasDown) {
-			if (screen != null) {
+			if (RadialOverlay.isOpen()) {
 				if (!radial.isHoldToOpen()) {
-					minecraft.setScreenAndShow(null);
+					RadialOverlay.close(true);
 				}
 			} else if (minecraft.mouseHandler.isMouseGrabbed()) {
-				RadialMenuScreen.open("");
+				RadialOverlay.open("");
 			}
-		} else if (!down && wasDown && screen != null && radial.isHoldToOpen()) {
-			if (!screen.releaseHovered()) {
-				RadialMenuScreen.close();
+		} else if (!down && wasDown && RadialOverlay.isOpen() && radial.isHoldToOpen()) {
+			if (!RadialOverlay.activate()) {
+				RadialOverlay.close(true);
 			}
 		}
 
