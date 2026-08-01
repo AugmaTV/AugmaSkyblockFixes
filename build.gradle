@@ -140,7 +140,7 @@ publishing {
 
 publishMods {
     file = tasks.shadowJar.archiveFile
-    version = "${project.mod_version}+${project.minecraft_version}"
+    version = project.mod_version
     displayName = project.mod_version
     changelog = providers.fileContents(layout.projectDirectory.file("CHANGELOG.md")).asText.orElse("")
     type = STABLE
