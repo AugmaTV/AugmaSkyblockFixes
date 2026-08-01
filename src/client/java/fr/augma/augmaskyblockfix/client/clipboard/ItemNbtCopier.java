@@ -29,7 +29,7 @@ public class ItemNbtCopier {
 	private static void feedback(final String message) {
 		final Minecraft minecraft = Minecraft.getInstance();
 		if (minecraft.player != null) {
-			minecraft.player.sendOverlayMessage(Component.literal(message));
+			minecraft.player.sendSystemMessage(Component.literal(message));
 		}
 	}
 
