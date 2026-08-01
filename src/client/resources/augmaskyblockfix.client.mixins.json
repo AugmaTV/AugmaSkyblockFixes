@@ -4,6 +4,7 @@
   "package": "fr.augma.augmaskyblockfix.client.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
+    "AbstractContainerScreenMixin",
     "BlockStateBaseMixin",
     "EntityRendererMixin",
     "LivingEntityRendererMixin"
