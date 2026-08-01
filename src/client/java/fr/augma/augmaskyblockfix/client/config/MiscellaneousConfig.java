@@ -22,6 +22,11 @@ public class MiscellaneousConfig {
 	public boolean levelGradientNametags = false;
 
 	@Expose
+	@ConfigOption(name = "Level gradient in chat", desc = "Same gradient on the levels shown in chat messages")
+	@ConfigEditorBoolean
+	public boolean levelGradientChat = false;
+
+	@Expose
 	@ConfigOption(name = "Level gradient in tab", desc = "Same gradient in the player list, incompatible with the custom tab list of other mods")
 	@ConfigEditorBoolean
 	public boolean levelGradientTab = false;

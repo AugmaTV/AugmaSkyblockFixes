@@ -7,6 +7,7 @@
     "AbstractContainerScreenMixin",
     "BlockStateBaseMixin",
     "EntityRendererMixin",
+    "GuiMessageMixin",
     "HudMixin",
     "LivingEntityRendererMixin",
     "MinecraftMixin",

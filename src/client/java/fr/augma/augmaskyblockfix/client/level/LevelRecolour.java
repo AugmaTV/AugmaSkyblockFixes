@@ -76,9 +76,21 @@ public class LevelRecolour {
 			}
 
 			final char character = text.charAt(index);
-			if (character == '§' && index + 1 < text.length()) {
+			if (character == '§') {
+				if (index + 1 >= text.length()) {
+					index++;
+					continue;
+				}
+
+				final ChatFormatting formatting = ChatFormatting.getByCode(Character.toLowerCase(text.charAt(index + 1)));
+				if (formatting == null) {
+					buffer.append(character).append(text.charAt(index + 1));
+					index += 2;
+					continue;
+				}
+
 				flush(rebuilt, buffer, current);
-				current = advance(current, text.charAt(index + 1));
+				current = current.applyLegacyFormat(formatting);
 				index += 2;
 				continue;
 			}
@@ -98,23 +110,6 @@ public class LevelRecolour {
 
 		target.append(Component.literal(buffer.toString()).setStyle(style));
 		buffer.setLength(0);
-	}
-
-	private static Style advance(final Style style, final char code) {
-		final char lower = Character.toLowerCase(code);
-		if (lower == 'r') {
-			return Style.EMPTY;
-		}
-
-		final ChatFormatting formatting = ChatFormatting.getByCode(lower);
-		if (formatting == null) {
-			return style;
-		}
-		return isColour(lower) ? Style.EMPTY.withColor(formatting) : style.applyFormat(formatting);
-	}
-
-	private static boolean isColour(final char code) {
-		return (code >= '0' && code <= '9') || (code >= 'a' && code <= 'f');
 	}
 
 	private static int levelOf(final String text) {
