@@ -19,14 +19,16 @@ public abstract class MouseHandlerMixin {
             return;
         }
 
-        final boolean onRelease = ModConfig.get().getRadial().isActivateOnRelease() && !RadialOverlay.isCenterActive();
+        final boolean right = info.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
         if (action == GLFW.GLFW_PRESS) {
-            if (info.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+            if (right) {
                 RadialOverlay.back();
-            } else if (!onRelease) {
+            } else {
                 RadialOverlay.activate();
             }
-        } else if (action == GLFW.GLFW_RELEASE && onRelease && info.button() != GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+        } else if (action == GLFW.GLFW_RELEASE && !right
+                && ModConfig.get().getRadial().isActivateOnRelease()
+                && !RadialOverlay.isCenterActive()) {
             RadialOverlay.activate();
         }
         ci.cancel();
