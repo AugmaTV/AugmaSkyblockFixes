@@ -17,9 +17,14 @@ public class MiscellaneousConfig {
 	public Property<Boolean> centeredPlants = Property.of(false);
 
 	@Expose
-	@ConfigOption(name = "Level gradient", desc = "Blend the skyblock level colour towards the next tier colour as the level progresses through its tier")
+	@ConfigOption(name = "Level gradient on nametags", desc = "Blend the skyblock level colour towards the next tier colour on the names shown above players")
 	@ConfigEditorBoolean
-	public boolean levelGradient = false;
+	public boolean levelGradientNametags = false;
+
+	@Expose
+	@ConfigOption(name = "Level gradient in tab", desc = "Same gradient in the player list, incompatible with the custom tab list of other mods")
+	@ConfigEditorBoolean
+	public boolean levelGradientTab = false;
 
 	@Expose
 	@ConfigOption(name = "Copy item nbt", desc = "Press the key below while hovering an item in any container to copy its nbt to the clipboard")

@@ -22,13 +22,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(EntityRenderer.class)
+@Mixin(value = EntityRenderer.class, priority = 2000)
 public abstract class EntityRendererMixin {
 
     @Inject(method = "getNameTag", at = @At("RETURN"), cancellable = true)
     private void gradeLevelColour(Entity entity, CallbackInfoReturnable<Component> cir) {
         final Component name = cir.getReturnValue();
-        if (name == null || !(entity instanceof Player) || !ModConfig.get().getMiscellaneous().isLevelGradient()) {
+        if (name == null || !(entity instanceof Player) || !ModConfig.get().getMiscellaneous().isLevelGradientNametags()) {
             return;
         }
 
