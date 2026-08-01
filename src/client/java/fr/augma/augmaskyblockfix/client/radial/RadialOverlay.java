@@ -85,6 +85,10 @@ public class RadialOverlay {
 		close(true);
 	}
 
+	public static boolean isCenterActive() {
+		return centerActive;
+	}
+
 	public static boolean activate() {
 		if (centerActive) {
 			back();
