@@ -50,6 +50,11 @@ public class RadialConfig {
 	public boolean blur = false;
 
 	@Expose
+	@ConfigOption(name = "Activate on release", desc = "Run a shortcut when the mouse button is released instead of when it is pressed. The centre button always reacts on press")
+	@ConfigEditorBoolean
+	public boolean activateOnRelease = true;
+
+	@Expose
 	@ConfigOption(name = "General direction click", desc = "When the cursor is not on a slice, pick the slice closest to the cursor direction")
 	@ConfigEditorBoolean
 	public boolean generalDirection = false;

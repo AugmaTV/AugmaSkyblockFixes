@@ -1,5 +1,6 @@
 package fr.augma.augmaskyblockfix.client.mixin;
 
+import fr.augma.augmaskyblockfix.client.config.ModConfig;
 import fr.augma.augmaskyblockfix.client.radial.RadialOverlay;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -18,12 +19,15 @@ public abstract class MouseHandlerMixin {
             return;
         }
 
+        final boolean onRelease = ModConfig.get().getRadial().isActivateOnRelease() && !RadialOverlay.isCenterActive();
         if (action == GLFW.GLFW_PRESS) {
             if (info.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
                 RadialOverlay.back();
-            } else {
+            } else if (!onRelease) {
                 RadialOverlay.activate();
             }
+        } else if (action == GLFW.GLFW_RELEASE && onRelease && info.button() != GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+            RadialOverlay.activate();
         }
         ci.cancel();
     }
